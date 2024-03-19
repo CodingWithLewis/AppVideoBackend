@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - 8000:8000
+    volumes:
+      - .:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8000
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+  ngrok:
+    image: ngrok/ngrok:latest
+    restart: unless-stopped
+    links:
+      - app
+    command:
+      - "start"
+      - "--all"
+      - "--config"
+      - "/etc/ngrok.yml"
+    volumes:
+      - ./ngrok.yml:/etc/ngrok.yml
+    ports:
+      - 4040:4040
+
+  yamnet:
+    image: tensorflow/serving
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./yamnet:/models/yamnet
+    environment:
+      - MODEL_NAME=yamnet
+    restart: unless-stopped
+
