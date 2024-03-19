@@ -19,3 +19,4 @@ helpers/demo
 *.bin
 *.png
 ngrok.yml
+!readmeimages/*.png
